@@ -28,6 +28,7 @@
 	    (html5-parser:element-map-children
 	     (lambda (n-node) (map-dom recurse-p fn n-node)) node)))))
 
+
 (defun html-recurse-p (node)
   (not (or (equalp (html5-parser:node-name node) "script")
 	   (equalp (html5-parser:node-name node) "style")
@@ -37,6 +38,10 @@
   (if (equalp (html5-parser:node-name node) name)
       node))
 
+(defun find-first-node (root recurse-p fn-test)
+  (map-dom recurse-p (lambda (n) (if (funcall fn-test n)
+					    (return-from find-first-node n))) root))
+  
 (defun collect-nodes (root fn-test)
   (let (res)
     (labels ((coll (test node)
@@ -48,16 +53,11 @@
 			 (push node res))))))
       (coll fn-test root))
     (reverse res)))
-
-(defun collect-all (name root)
-  (collect-nodes root #'(lambda (n) (get-node-name name n))))
-
-(defun get-link (n)
-  (let ((url (html5-parser:element-attribute n "href")))
+ 
+(defun link-full (url)
     (if (cl-ppcre:all-matches "^https?:\/\/" url)
-	(return-from get-link url)
-	(return-from get-link (concatenate 'string *uri* url)))))
-
+	(return-from link-full url)
+	(return-from link-full (concatenate 'string *uri* url))))
 
 (defun get-post-data (root)
   (let ((nodes (collect-all "input" root)))
