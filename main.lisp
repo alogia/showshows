@@ -2,9 +2,7 @@
 (require :cl-ppcre)
 (require :cl-base64)
 (require :cl-html5-parser)
-
-(defpackage :io.alogia.showshows
-  (:use :common-lisp))
+(in-package :showshows)
 
 (defvar *user-agent* "Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48B; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.65 Mobile Safari/537.36")
 
@@ -40,7 +38,7 @@
       node))
 
 (defun collect-nodes (root fn-test)
-  (let (res '())
+  (let (res)
     (labels ((coll (test node)
 	       (if node
 		   (progn
@@ -61,14 +59,13 @@
 	(return-from get-link (concatenate 'string *uri* url)))))
 
 
-
 (defun get-post-data (root)
   (let ((nodes (collect-all "input" root)))
     (cdr (reverse (pairlis (mapcar #'(lambda (n) (html5-parser:element-attribute n "name")) nodes)
 	     (mapcar #'(lambda (n) (html5-parser:element-attribute n "value")) nodes))))))
 
 
-(defun vid-post (uri data)
+(defun http-post (uri data)
   (drakma:http-request uri :user-agent *user-agent* :method :post :parameters data)) 
 
 
