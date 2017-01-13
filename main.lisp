@@ -64,7 +64,11 @@
     (cdr (reverse (pairlis (mapcar #'(lambda (n) (html5-parser:element-attribute n "name")) nodes)
 	     (mapcar #'(lambda (n) (html5-parser:element-attribute n "value")) nodes))))))
 
-
+(defun decode-link (uri)
+  (let ((res (car (cdr (cl-ppcre:split "r=" uri)))))
+    (if res
+	(cl-base64:base64-string-to-string  res))))
+  
 (defun http-post (uri data)
   (drakma:http-request uri :user-agent *user-agent* :method :post :parameters data)) 
 
@@ -91,3 +95,7 @@
 
 (defmacro types (&rest types)
   `#'(lambda (n) (or ,@(node-type-list types))))
+
+
+(defun uri-exists? (uri)
+  (drakma:http-request uri :cookie-jar *cookie-jar* :user-agent *user-agent* :method :head))
