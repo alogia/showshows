@@ -7,10 +7,13 @@
   :components ((:file "package")
 	       (:file "main")
 	       (:file "watchseries")
-	       (:file "vidto.me"))
+	       (:file "vidto.me")
+	       (:file "database")
+	       (:file "web"))
   :depends-on (:drakma
 	       :cl-base64
 	       :cl-ppcre
 	       :cl-html5-parser
 	       :clsql
+	       :cl-who
 	       :hunchentoot))
