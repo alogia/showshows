@@ -14,10 +14,14 @@
     (list :name name :date date :href href :node node)))  
 
 (defun get-shows (node)
-  (mapcar #'(lambda (s) (process-show s)) (collect-nodes node (types "a"))))
+  (mapcar (lambda (s) (process-show s))
+	  (collect-nodes node (types "a"))))
 
 (defun get-link-table (node)
   (find-first-node node #'html-recurse-p (elements ("id" . "linktable"))))
 
 (defun get-links (node)
-  (mapcar (lambda (n) (html5-parser:element-attribute n "href")) (collect-nodes node (elements ("target" . "_blank") ("class" . "buttonLink")))))
+  (mapcar (lambda (n) (html5-parser:element-attribute n "href"))
+	  (collect-nodes node (elements ("target" . "_blank") ("class" . "buttonLink")))))
+
+

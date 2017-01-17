@@ -96,6 +96,17 @@
 (defmacro types (&rest types)
   `#'(lambda (n) (or ,@(node-type-list types))))
 
-
 (defun uri-exists? (uri)
-  (drakma:http-request uri :cookie-jar *cookie-jar* :user-agent *user-agent* :method :head))
+  (let ((code (handler-case
+		  (nth-value 1 (drakma:http-request uri :cookie-jar *cookie-jar* :user-agent *user-agent* :method :head))
+		(usocket:ns-host-not-found-error () 404))))
+    (if (equal code 200)
+	200
+	nil)))
+
+(defun get-header (uri)
+  (handler-case
+      (nth-value 2 (drakma:http-request uri :cookie-jar *cookie-jar* :user-agent *user-agent* :method :head))
+    (usocket:ns-host-not-found-error () nil)
+    (usocket:timeout-error () nil)))
+ 

@@ -11,4 +11,6 @@
   :depends-on (:drakma
 	       :cl-base64
 	       :cl-ppcre
-	       :cl-html5-parser))
+	       :cl-html5-parser
+	       :clsql
+	       :hunchentoot))
