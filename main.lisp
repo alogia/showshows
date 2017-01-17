@@ -72,6 +72,11 @@
 (defun http-post (uri data)
   (drakma:http-request uri :user-agent *user-agent* :method :post :parameters data)) 
 
+(defun make-get-request (url params)
+  (let ((res (concatenate 'string url "?")))
+    (dolist (args params)
+      (setf res (concatenate 'string res (pop args) "=" (substitute #\+ #\Space args) "&")))
+    (string-right-trim "&" res)))
 
 (defun make-element-test (elem)
   (if (listp elem)
@@ -108,5 +113,6 @@
   (handler-case
       (nth-value 2 (drakma:http-request uri :cookie-jar *cookie-jar* :user-agent *user-agent* :method :head))
     (usocket:ns-host-not-found-error () nil)
-    (usocket:timeout-error () nil)))
+    (usocket:timeout-error () nil)
+    (usocket:host-unreachable-error () nil)))
  
