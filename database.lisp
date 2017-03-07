@@ -13,6 +13,7 @@
   (clsql:create-table [shows] '(([id]   integer :not-null :unique :primary-key :auto-increment)
 				([name] string :not-null)
 				([uri]  string :not-null)
+				([img]  string) ; path to image in /images/
 				([last] integer)
 				([success] boolean))) ; all episodes found successfully when last attempted?
 		      

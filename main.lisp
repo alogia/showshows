@@ -13,6 +13,12 @@
 
 (defvar *cookie-jar* (make-instance 'drakma:cookie-jar))
 
+(defun init ()
+  "Main program initializations"
+  (setq drakma:*text-content-types* (cons '("application" . "json")
+					  drakma:*text-content-types*))
+  (init-web 4242))
+
 (defun get-dom (url)
   (progn
     (setf *uri* url)

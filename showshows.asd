@@ -15,5 +15,7 @@
 	       :cl-ppcre
 	       :cl-html5-parser
 	       :clsql
+	       :md5
+	       :cl-json
 	       :cl-who
 	       :hunchentoot))
