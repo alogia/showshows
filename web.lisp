@@ -6,6 +6,12 @@
 
 (defvar *web-server* nil)
 
+(defun get-show-info (show)
+  (json:decode-json-from-string (map 'string 'code-char (drakma:http-request (make-get-request "http://www.omdbapi.com" `(("t" . ,show) ("r" . "json"))) :method :get))))
+
+(defun get-show-poster (show)
+  (cdr (assoc :*poster (get-show-info show))))
+
 (defun init-web (port)
   "Basic init code to open a new instance of hunchentoot and create the landing page."
   (if (null *web-server*)
@@ -15,7 +21,7 @@
 
 
 (defun make-landing ()
-  (hunchentoot:define-easy-handler (front-page :uri "/") ()
+(hunchentoot:define-easy-handler (front-page :uri "/") ()
     (page-skel "Showshows" ((:img :src (get-show-poster "game of thrones"))))))
 
     
@@ -29,8 +35,4 @@
 			 :href "web/css/default.css"))
 	   (:body ,@body))))
     
-(defun get-show-info (show)
-  (json:decode-json-from-string (drakma:http-request (make-get-request "http://www.omdbapi.com" `(("t" . ,show) ("r" . "json"))) :method :get)))
 
-(defun get-show-poster (show)
-  (cdr (assoc :*poster (get-show-info show))))

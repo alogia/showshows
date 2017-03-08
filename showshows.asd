@@ -9,7 +9,8 @@
 	       (:file "watchseries")
 	       (:file "vidto.me")
 	       (:file "database")
-	       (:file "web"))
+	       (:file "web")
+	       (:file "hosting")
   :depends-on (:drakma
 	       :cl-base64
 	       :cl-ppcre

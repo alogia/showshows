@@ -66,7 +66,7 @@
 	(return-from link-full (concatenate 'string *uri* url))))
 
 (defun get-post-data (root)
-  (let ((nodes (collect-all "input" root)))
+  (let ((nodes (collect-nodes root #'(lambda (n) (get-node-name "input" n)))))
     (cdr (reverse (pairlis (mapcar #'(lambda (n) (html5-parser:element-attribute n "name")) nodes)
 	     (mapcar #'(lambda (n) (html5-parser:element-attribute n "value")) nodes))))))
 
