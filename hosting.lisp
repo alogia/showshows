@@ -2,15 +2,19 @@
 
 ;;; Basic generic definitions for adding hosting websites.
 ;;; All hosting sites should subclass host and intantiate methods:
-;;;     host-wait-post
-;;;     host-parse-vid
+;;;     wait-post
+;;;     parse-video
+
+
+;;A file lock to access the returned values of web crawls
+(defvar *spider-lock* (bt:make-lock))
 
 ;;Generic host class for all hosting websites 
 (defclass host ()
   ((url
     :initarg :url
     :initform (error "Error: No url provided")
-    :reader host-url
+    :reader url
     :documentation "The url of the page containing the video link")
    (video
     :initarg :video
@@ -32,4 +36,6 @@
 (defgeneric wait-post (host)
   (:documentation "Post data to wait ad page on first call"))
 
+(defgeneric parse-video (host dom)
+  (:documentation "Parse the video url from returned html"))
 

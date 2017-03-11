@@ -10,7 +10,7 @@
 	       (:file "vidto.me")
 	       (:file "database")
 	       (:file "web")
-	       (:file "hosting")
+	       (:file "hosting"))
   :depends-on (:drakma
 	       :cl-base64
 	       :cl-ppcre
@@ -19,4 +19,5 @@
 	       :md5
 	       :cl-json
 	       :cl-who
+	       :bordeaux-threads
 	       :hunchentoot))

@@ -8,9 +8,6 @@
 
 (defvar *test* "http://vidto.me/rgvyvjj5nrt8.html")
 
-(defvar *uri* nil)
-(defvar *dom* nil)
-
 (defvar *cookie-jar* (make-instance 'drakma:cookie-jar))
 
 (defun init ()
@@ -20,9 +17,7 @@
   (init-web 4242))
 
 (defun get-dom (url)
-  (progn
-    (setf *uri* url)
-    (setf *dom* (html5-parser:parse-html5 (drakma:http-request url :cookie-jar *cookie-jar* :user-agent *user-agent*)))))
+  (html5-parser:parse-html5 (drakma:http-request url :cookie-jar *cookie-jar* :user-agent *user-agent*)))
 
 (defun map-dom (recurse-p fn node)
   "fn(node) 
