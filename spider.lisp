@@ -27,7 +27,7 @@
 (defun spawn-request (h)
   "Request that the given object be added to the waiting list of spawning threads"
   (bt:with-lock-held (*spawn-lock*)
-    (setf *spawn-list* (append (list h) *spawn-list*))))
+    (setf *spawn-list* (append *spawn-list* (list h)))))
 
 (defun manage-spawn (max-threads interval)
   "Starts a thread to manage the amount of spawning objects. interval is the sleep time between checks on still running threads. Terminates on *spawn-list* and *spawn-threads* == 0."
@@ -38,12 +38,14 @@
 			       (bt:with-lock-held (*spawn-lock*) (setf n (list-length (purge-finished))))
 			       (if (<= n max-threads)
 				   (if (not (= (list-length *spawn-list*) 0))
-				       (spawn-host-thread (bt:with-lock-held (*spawn-lock*) (pop *spawn-list*)))
-				       (if (= n 0)
-					   (return)))
-				   (sleep interval))))) :name "Spawn Manager")))
+				       (spawn-host-thread (bt:with-lock-held (*spawn-lock*) (pop *spawn-list*))) ; Start a new thread of there is a request and under max-threads
+				       (if (= n 0) ; if no threads running
+					   (return) ; Return when nothing to do
+					   (sleep interval))) ; Sleep if there are still threads running, but nothing new to spawn
+				   (sleep interval))))) ; Sleep if there are too many threads running. 
+			:name "Spawn Manager")))
 
-(defun kill-spawn-manager ()
+(defun shutdown-spawn ()
   "Shuts down the spawn manager"
   (bt:destroy-thread *spawn-manager*))
 
