@@ -38,8 +38,10 @@
 			       (bt:with-lock-held (*spawn-lock*) (setf n (list-length (purge-finished))))
 			       (if (<= n max-threads)
 				   (if (not (= (list-length *spawn-list*) 0))
-				       (spawn-host-thread (bt:with-lock-held (*spawn-lock*) (pop *spawn-list*))))
-				   (sleep interval))))))))
+				       (spawn-host-thread (bt:with-lock-held (*spawn-lock*) (pop *spawn-list*)))
+				       (if (= n 0)
+					   (return)))
+				   (sleep interval))))) :name "Spawn Manager")))
 
 (defun kill-spawn-manager ()
   "Shuts down the spawn manager"
@@ -61,7 +63,7 @@
 
 (defun purge-finished ()
   "Cleans up the threads list"
-  (delete-if-not #'bt:thread-alive-p *spawn-threads*))
+  (setf *spawn-threads* (delete-if-not #'bt:thread-alive-p *spawn-threads*)))
 
 (defun spawn-select (predicate)
   "Filter function with test predicate around the list of spider objects"
