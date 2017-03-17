@@ -1,7 +1,6 @@
 (in-package :showshows)
 
 (require 'bordeaux-threads)
-(require 'cl-html5-parser)
 
 ;;; A basic thread handler to manage the web crawling of all listed
 ;;; sites. The spawn manager will keep the number of threads to a
