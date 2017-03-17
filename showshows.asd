@@ -10,7 +10,8 @@
 	       (:file "vidto.me")
 	       (:file "database")
 	       (:file "web")
-	       (:file "hosting"))
+	       (:file "hosting")
+	       (:file "spider"))
   :depends-on (:drakma
 	       :cl-base64
 	       :cl-ppcre

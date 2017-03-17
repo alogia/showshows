@@ -22,7 +22,7 @@
 
 (defun make-landing ()
 (hunchentoot:define-easy-handler (front-page :uri "/") ()
-    (page-skel "Showshows" ((:img :src (get-show-poster "game of thrones"))))))
+    (page-skel "Showshows" (:img :src (get-show-poster "game of thrones")))))
 
     
 (defmacro page-skel (title &body body)

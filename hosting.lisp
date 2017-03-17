@@ -5,10 +5,6 @@
 ;;;     wait-post
 ;;;     parse-video
 
-
-;;A file lock to access the returned values of web crawls
-(defvar *spider-lock* (bt:make-lock))
-
 ;;Generic host class for all hosting websites 
 (defclass host ()
   ((url
@@ -20,6 +16,10 @@
     :initarg :video
     :accessor video-url
     :documentation "The url of the video")
+   (dom
+    :initarg :dom
+    :accessor dom
+    :documentation "cl-html5-parser dom returned by parsing http response")
    (checked
     :initarg :checked
     :accessor checked
