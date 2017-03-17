@@ -27,17 +27,18 @@
 (defun spawn-request (h)
   "Request that the given object be added to the waiting list of spawning threads"
   (bt:with-lock-held (*spawn-lock*)
-    (append h *spawn-list*)))
+    (setf *spawn-list* (append (list h) *spawn-list*))))
 
 (defun manage-spawn (max-threads interval)
-  "Starts a thread to manage the amount of spawning objects. interval is the sleep time between checks on still running threads."
+  "Starts a thread to manage the amount of spawning objects. interval is the sleep time between checks on still running threads. Terminates on *spawn-list* and *spawn-threads* == 0."
   (setf *spawn-manager*
 	(bt:make-thread (lambda ()
 			  (loop
 			     (let ((n 0))
 			       (bt:with-lock-held (*spawn-lock*) (setf n (list-length (purge-finished))))
 			       (if (<= n max-threads)
-				   (spawn-host-thread (bt:with-lock-held (*spawn-lock*) (pop *spawn-list*)))
+				   (if (not (= (list-length *spawn-list*) 0))
+				       (spawn-host-thread (bt:with-lock-held (*spawn-lock*) (pop *spawn-list*))))
 				   (sleep interval))))))))
 
 (defun kill-spawn-manager ()
@@ -63,5 +64,6 @@
   (delete-if-not #'bt:thread-alive-p *spawn-threads*))
 
 (defun spawn-select (predicate)
-  (mapcar #'spawn-host-thread (remove-if predicate *spider-objects*)))
+  "Filter function with test predicate around the list of spider objects"
+  (mapcar #'spawn-request (remove-if predicate *spider-objects*)))
 
