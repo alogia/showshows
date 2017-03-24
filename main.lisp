@@ -103,6 +103,7 @@
   `#'(lambda (n) (or ,@(node-type-list types))))
 
 (defun uri-exists? (uri)
+  "Returns 200 if the uri exists, or nil if not found."
   (let ((code (handler-case
 		  (nth-value 1 (drakma:http-request uri :cookie-jar *cookie-jar* :user-agent *user-agent* :method :head))
 		(usocket:ns-host-not-found-error () 404))))
@@ -111,9 +112,13 @@
 	nil)))
 
 (defun get-header (uri)
+  "Returns the header of the uri."
   (handler-case
       (nth-value 2 (drakma:http-request uri :cookie-jar *cookie-jar* :user-agent *user-agent* :method :head))
     (usocket:ns-host-not-found-error () nil)
     (usocket:timeout-error () nil)
     (usocket:host-unreachable-error () nil)))
  
+(defun uri-length (uri)
+  "Returns the length of data found at uri."
+    (parse-integer (cdr (assoc :content-length (get-header uri)))))

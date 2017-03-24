@@ -91,4 +91,4 @@
 
 (defun spawn-select (predicate)
   "Filter function with test predicate around the list of spider objects"
-  (mapcar #'spawn-request (remove-if predicate *spider-objects*)))
+  (mapcar #'spawn-request (remove-if-not predicate *spider-objects*)))

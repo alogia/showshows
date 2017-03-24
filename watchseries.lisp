@@ -8,8 +8,7 @@
 
 (defun get-seasons (node)
   "Call this method on the main seasons page for a show"
-  (let* (
-	 (n-nodes (mapcar #'(lambda (n) (find-first-node n #'html-recurse-p (elements ("itemprop" . "name")))) (collect-nodes node (elements ("class" . "lists")))))
+  (let* ((n-nodes (mapcar #'(lambda (n) (find-first-node n #'html-recurse-p (elements ("itemprop" . "name")))) (collect-nodes node (elements ("class" . "lists")))))
 	 (names (mapcar #'(lambda (n) (html5-parser:node-value (html5-parser:node-first-child n))) n-nodes))
 	 (listings (mapcar #'get-shows (collect-nodes node (elements ("class" . "listings show-listings"))))))
     (pairlis names listings)))
@@ -29,9 +28,13 @@
 ;; Functions for host listing
 ;; --------------------------------------------------------------
 
+(defun clean-host-links (links)
+  "Returns only hosts which exist"
+  (delete-if-not #'uri-exists? links))
+
 (defun get-host-links (node)
   "Function to call to parse and decode all links on host listing page."
-  (mapcar #'decode-link (get-links (get-link-table node))))
+  (clean-host-links (mapcar #'decode-link (get-links (get-link-table node)))))
 
 (defun get-link-table (node)
   "Called on show host list"
