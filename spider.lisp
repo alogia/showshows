@@ -63,26 +63,21 @@
   (bt:destroy-thread *spawn-manager*)
   (setf *spawn-threads-run* 0))
 
-(defun spawn-host-thread (h)
-  "Called by the spawn manager to initiate a new host thread"
+
+
+(defun spawn-thread (url func)
+  "Called by the spawn manager to initiate a new host thread. func takes no arguments"
   (incf *spawn-threads-run*)
-  (spawn-log "Spawning thread ~a~%" (url h))
+  (spawn-log "Spawning spider for ~a~%" url)
   (push (bt:make-thread (lambda ()
-			  (with-slots (url) h
-			      (handler-case (let* ((res (wait-post h))
-						   (v (parse-video h res))
-						   (e (uri-exists? v)))
-					  (bt:with-lock-held (*spider-lock*)
-					    (progn (setf (dom h) res)
-						   (setf (video-url h) v)
-						   (setf (checked h) (get-universal-time))
-						   (setf (exists h) e))))
+			  (handler-case
+			      (funcall func)
 				#+sbcl(sb-int:simple-stream-error (se) (spawn-log "Whoops, ~a didn't work. ~a~%" url se))
 				(DRAKMA::DRAKMA-SIMPLE-ERROR (se) (spawn-log "Error? ~a threw ~a~%" url se))
 				(USOCKET:TIMEOUT-ERROR (se) (spawn-log "timeout error ~a threw ~a~%" url se))
 				(USOCKET:NS-HOST-NOT-FOUND-ERROR (se) (spawn-log "host-not-found error ~a threw ~a~%" url se))
-				(FLEXI-STREAMS:EXTERNAL-FORMAT-ENCODING-ERROR (se) (spawn-log "~a threw ~a~%" url se))))) 
-			:name (url h))
+				(FLEXI-STREAMS:EXTERNAL-FORMAT-ENCODING-ERROR (se) (spawn-log "~a threw ~a~%" url se)))) 
+			:name url)
 	*spawn-threads*))
 
 (defun purge-finished ()

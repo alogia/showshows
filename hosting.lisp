@@ -38,3 +38,15 @@
 
 (defgeneric parse-video (host dom)
   (:documentation "Parse the video url from returned html"))
+
+(defun spawn-host-thread (h)
+  "Function for spawning a thread to handle spidering host websites."
+  (spawn-thread (url h)
+		#'(lambda () (let* ((res (wait-post h))
+						   (v (parse-video h res))
+						   (e (uri-exists? v)))
+					  (bt:with-lock-held (*spider-lock*)
+					    (progn (setf (dom h) res)
+						   (setf (video-url h) v)
+						   (setf (checked h) (get-universal-time))
+						   (setf (exists h) e)))))))
