@@ -7,11 +7,11 @@
   :components ((:file "package")
 	       (:file "main")
 	       (:file "show")
+	       (:file "host")
 	       (:file "watchseries")
 	       (:file "vidto.me")
 	       (:file "database")
 	       (:file "web")
-	       (:file "hosting")
 	       (:file "spider"))
   :depends-on (:drakma
 	       :cl-base64
