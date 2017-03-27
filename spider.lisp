@@ -30,7 +30,18 @@
 (defmacro spawn-log (&rest text)
   `(bt:with-lock-held (*spawn-log-lock*)
     (with-open-file (log *spawn-log* :direction :output :if-exists :append :if-does-not-exist :create)
-      (format log ,@text))))
+      (multiple-value-bind (second minute hour date month year day-of-week dst-p tz)
+	  (get-decoded-time)
+	(declare (ignorable day-of-week dst-p))
+	(format log "~2,'0d:~2,'0d:~2,'0d - ~d/~2,'0d/~d (GMT~@d):  "
+		year
+		month
+		date
+		hour
+		minute
+		second
+		(- tz))
+	(format log ,@text)))))
       
 (defun spawn-request (h)
   "Request that the given object be added to the waiting list of spawning threads"
@@ -39,7 +50,8 @@
 
 (defun manage-spawn (max-threads interval)
   "Starts a thread to manage the amount of spawning objects. interval is the sleep time between checks on still running threads. Terminates on *spawn-list* and *spawn-threads* == 0."
-  (spawn-log "--- Starting to spawn --- ~%~D requests in queue.~%" (list-length *spawn-list*))
+  (spawn-log "--- Starting to spawn --- ~%")
+  (spawn-log "---~D requests in queue.~%" (list-length *spawn-list*))
   (setf *spawn-manager*
 	(bt:make-thread (lambda ()
 			  (loop
@@ -50,7 +62,8 @@
 				       (spawn-host-thread (bt:with-lock-held (*spawn-lock*) (pop *spawn-list*))) ; Start a new thread of there is a request and under max-threads
 				       (if (= n 0) ; if no threads running
 					   (progn
-					     (spawn-log "--- Spawn Manager finished --- ~%Threads run: ~D~%" *spawn-threads-run*)
+					     (spawn-log "--- Spawn Manager finished --- ~%")
+					     (spawn-log "Threads run: ~D~%" *spawn-threads-run*)
 					     (setf *spawn-threads-run* 0)
  					     (return)) ; Return when nothing to do
 					   (sleep interval))) ; Sleep if there are still threads running, but nothing new to spawn
