@@ -54,7 +54,7 @@
 			       (bt:with-lock-held (*spawn-lock*) (setf n (list-length (purge-finished))))
 			       (if (<= n max-threads)
 				   (if (not (= (list-length *spawn-list*) 0))
-				       (let ((th (pop *spawn-list*)))
+				       (let ((th (bt:with-lock-held (*spawn-lock*) (pop *spawn-list*))))
 					 (spawn-thread (cdr (assoc :url th)) (cdr (assoc :obj th)) (cdr (assoc :func th)))) ; Start a new thread of there is a request and under max-threads
 				       (if (= n 0) ; if no threads running
 					   (progn
@@ -81,9 +81,8 @@
   (spawn-log "Spawning spider for ~a" url)
   (push (bt:make-thread (lambda ()
 			  (handler-case
-			      (bt:with-lock-held (*spawn-lock*) ;;\\\\\\\\\\\\\\\\\\\\\\\\\ Is this the right place to lock?????? \\\\\\\\\\\\\\\\\\\\\
-				(let ((code (funcall func obj)))
-				  (spawn-log "Spider for ~a finished with code ~D" url code)))
+			      (let ((code (funcall func obj)))
+				(spawn-log "Spider for ~a finished with code ~D" url code))
 			    #+sbcl(sb-int:simple-stream-error (se) (spawn-log "Whoops, ~a didn't work. ~a" url se))
 			    (DRAKMA::DRAKMA-SIMPLE-ERROR (se) (spawn-log "Error? ~a threw ~a" url se))
 			    (USOCKET:TIMEOUT-ERROR (se) (spawn-log "timeout error ~a threw ~a" url se))
