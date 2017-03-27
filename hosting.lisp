@@ -38,4 +38,3 @@
 
 (defgeneric parse-video (host dom)
   (:documentation "Parse the video url from returned html"))
-

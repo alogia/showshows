@@ -6,6 +6,7 @@
   :serial t
   :components ((:file "package")
 	       (:file "main")
+	       (:file "show")
 	       (:file "watchseries")
 	       (:file "vidto.me")
 	       (:file "database")

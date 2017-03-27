@@ -6,24 +6,33 @@
 ;; Functions for show listing page
 ;; ---------------------------------------------------------------
 
-(defun get-seasons (node)
+(defun get-seasons (name url node)
   "Call this method on the main seasons page for a show"
-  (let* ((n-nodes (mapcar #'(lambda (n) (find-first-node n #'html-recurse-p (elements ("itemprop" . "name")))) (collect-nodes node (elements ("class" . "lists")))))
-	 (names (mapcar #'(lambda (n) (html5-parser:node-value (html5-parser:node-first-child n))) n-nodes))
-	 (listings (mapcar #'get-shows (collect-nodes node (elements ("class" . "listings show-listings"))))))
-    (pairlis names listings)))
-	
-(defun process-show (node)
-  "Internal function to parse show nodes"
-  (let ((href (html5-parser:element-attribute node "href"))
-	(name (html5-parser:node-value (html5-parser:node-first-child (find-first-node node #'html-recurse-p (elements ("itemprop" . "name"))))))
-	(date (html5-parser:node-value (html5-parser:node-first-child (find-first-node node #'html-recurse-p (elements ("itemprop" . "datepublished")))))))
-    (list :name name :date date :href href :node node)))  
+    (create-show name url (mapcar #'(lambda (n) (process-season name n))
+		      (collect-nodes node (elements ("class" . "listings show-listings")))))
 
-(defun get-shows (node)
+(defun process-season (show node)
+  (let ((num (parse-integer (car (ppcre:all-matches-as-strings "[0-9]+$" (html5-parser:element-attribute node "id"))))))
+    (create-season show num (get-shows show num node))))
+
+(defun get-shows (show season node)
   "Internal function to parse season nodes"
-  (mapcar (lambda (s) (process-show s))
-	  (collect-nodes node (types "a"))))
+  (mapcar (lambda (s) (process-show show season s))
+	  (collect-nodes node (elements ("itemprop" . "episode")))))
+
+(defun process-show (show season node)
+  "Internal function to parse show nodes"
+  (let ((num (html5-parser:element-attribute (find-first-node node #'html-recurse-p (elements ("itemprop" . "episodenumber"))) "content"))
+	(a (find-first-node node #'html-recurse-p (types "a"))))
+    (let
+	 ((href (html5-parser:element-attribute a "href"))
+	  (name (html5-parser:node-first-child (find-first-node a #'html-recurse-p (elements ("itemprop" . "name")))))
+	  (date (html5-parser:node-first-child (find-first-node a #'html-recurse-p (elements ("itemprop" . "datepublished"))))))
+      (create-episode show season num
+		      (if name (html5-parser:node-value name) "Unknown")
+		      (if date (html5-parser:node-value date) "Unknown")
+		      href nil))))
+      
 
 ;; Functions for host listing
 ;; --------------------------------------------------------------

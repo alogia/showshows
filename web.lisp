@@ -40,7 +40,6 @@
   (loop for h in rows
        collect `(:th ,h)))
 
-  
 (defmacro page-skel (title &body body)
   "Defines the basic html code which should subsume page individualizations."
   `(cl-who:with-html-output-to-string (*standard-output* nil :prologue t :indent t)
@@ -51,4 +50,3 @@
 			 :rel "stylesheet"
 			 :href "web/css/default.css"))
 	   (:body ,@body))))
-    
