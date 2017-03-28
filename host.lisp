@@ -34,14 +34,14 @@
 (defgeneric parse-video (host dom)
   (:documentation "Parse the video url from returned html"))
 
-(defmethod  spawn (host)
+(defmethod spawn ((h host))
   "Function to pass to the spawn manager when spawning a thread to handle spidering host websites. Errors caught in (spawn-host)"
-  (let* ((res (wait-post host))
-	 (v (parse-video host res))
+  (let* ((res (wait-post h))
+	 (v (parse-video h res))
 	 (e (uri-exists? v)))
     (bt:with-lock-held (*spider-lock*)
-      (progn (setf (dom host) res)
-	     (setf (video-url host) v)
-	     (setf (checked host) (get-universal-time))
-	     (setf (exists host) e)
+      (progn (setf (dom h) res)
+	     (setf (video-url h) v)
+	     (setf (checked h) (get-universal-time))
+	     (setf (exists h) e)
 	     200)))) ;; success: return 200 

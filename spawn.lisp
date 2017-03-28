@@ -27,7 +27,7 @@
     :reader url
     :documentation "The url of the page containing the video link")))
 
-(defgeneric spawn (host)
+(defgeneric spawn (spawnable)
   (:documentation "Main method of spawnable called by the spawn-manager at spawn. Must return error code or 200 on success."))
 
 (defun keep-spawnable (spawnable)

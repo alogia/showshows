@@ -1,8 +1,40 @@
 (in-package :showshows)
 
-(defun create-episode (show season num name date url hosts)
-  "Acons list to represent an episode"
-  (list :show show :season season :num num :name name :date date :url url :hosts hosts))
+(defclass episode (spawnable)
+  ((show
+    :initarg :show
+    :initform (error "Error: episode must be part of a show")
+    :reader show
+    :documentation "Name of the show to which this episode belongs")
+   (season
+    :initarg :season
+    :initform (error "Error: episode must have a season")
+    :reader season
+    :documentation "Season number to which this episode belongs")
+   (num
+    :initarg :num
+    :initform (error "Error: episode must have a number")
+    :reader num
+    :documentation "Number of this episode in the season")
+   (name
+    :initarg :name
+    :reader name
+    :documentation "Name of episode")
+   (date
+    :initarg :date
+    :reader date
+    :documentation "Date of episode")
+   (url
+    :initarg :url
+    :reader url
+    :documentation "Url of episode")
+   (hosts
+    :initform '()
+    :accessor hosts
+    :documentation "Hosts of episode")))
+
+(defmethod spawn ((e episode))
+  )
 
 (defun create-season (show num episodes)
   "Acons list to represent a season"
