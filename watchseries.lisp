@@ -33,9 +33,13 @@
 		      (if date (html5-parser:node-value date) "Unknown")
 		      href
 		      nil)))) ; Init host links to nil, and fill only upon request.
-      
+
+
+
+;;;;;;;;;;;;;=============================================================================FIXME=========================================
 (defun request-episode-hosts (episode)
-    "Adds ho
+  "Put in a request with the spawn manager to spider the episode listing pages on watchseries and return the host links."
+  episode)
 
 ;; Functions for host listing
 ;; --------------------------------------------------------------

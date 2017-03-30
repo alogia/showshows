@@ -44,7 +44,7 @@
 	(format log "~2,'0d/~2,'0d/~2,'0d - ~d:~2,'0d:~d (GMT~@d):  "
 		year month date hour minute second (- tz))
 	(format log ,@text)
-	(format log "~%")))
+	(format log "~%")))))
 
 (defun spawn-request (spawnable)
   "Request that the given spawnable object and spawning function be added to the waiting list of spawning threads"

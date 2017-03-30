@@ -5,12 +5,12 @@
     :initarg :show
     :initform (error "Error: episode must be part of a show")
     :reader show
-    :documentation "Name of the show to which this episode belongs")
+    :documentation "Parent show to which this episode belongs")
    (season
     :initarg :season
     :initform (error "Error: episode must have a season")
     :reader season
-    :documentation "Season number to which this episode belongs")
+    :documentation "Season to which this episode belongs")
    (num
     :initarg :num
     :initform (error "Error: episode must have a number")
@@ -33,14 +33,40 @@
     :accessor hosts
     :documentation "Hosts of episode")))
 
-(defmethod spawn ((e episode))
-  )
+(defmethod spawn ((ep episode)))
 
-(defun create-season (show num episodes)
-  "Acons list to represent a season"
-  (list (cons :show show) (cons :num num) (cons :episodes episodes)))
 
-(defun create-show (name url seasons)
-  "Acons list to represent a show"
-  (list (cons :name name) (cons :url url) (cons :seasons seasons)))
-  
+(defclass season (spawnable)
+  ((show
+    :initarg :show
+    :initform (error "Error: episode must be part of a show")
+    :reader show
+    :documentation "Parent show to which this Season belongs")
+   (num
+    :initarg :num
+    :initform (error "Error: Season must have a number")
+    :reader num
+    :documentation "Number of this season")
+   (hosts
+    :initform '()
+    :accessor hosts
+    :documentation "Episodes of season")))
+
+(defmethod spawn ((se season)))
+
+(defclass show (spawnable)
+    ((name
+      :initarg :name
+      :initform (error "Error: Show must have a name")
+      :reader name
+      :documentation "Show's name")
+     (url
+      :initarg :url
+      :accessor url
+      :documentation "The url of the show on watchseries")
+     (seasons
+      :initform '()
+      :accessor seasons
+      :documentation "A list of seasons of this show")))
+
+(defmethod spawn ((sh show)))
