@@ -33,7 +33,9 @@
     :accessor hosts
     :documentation "Hosts of episode")))
 
-(defmethod spawn ((ep episode)))
+(defmethod spawn ((ep episode))
+  (with-slots (url hosts) ep
+    (setf hosts (get-host-links (get-dom url)))))
 
 
 (defclass season (spawnable)
@@ -53,7 +55,9 @@
     :accessor episodes
     :documentation "Episodes of season")))
 
-(defmethod spawn ((se season)))
+(defmethod spawn ((se season))
+  (with-slots (show url) se
+    (setf se (process-season show (get-dom url)))))
 
 (defclass show (spawnable)
     ((name
@@ -72,4 +76,4 @@
       :documentation "A list of seasons of this show")))
 
 (defmethod spawn ((sh show))
-  )
+  (setf sh (parse-show (name sh) (url sh) (get-dom (url sh)))))

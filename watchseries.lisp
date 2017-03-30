@@ -6,9 +6,9 @@
 ;; Functions for show listing page
 ;; ---------------------------------------------------------------
 
-(defun get-show (name url)
+(defun init-show (name url)
   (parse-show name url (get-dom url)))
-
+  
 (defun parse-show (name url node)
   (make-instance 'show
 		 :name name
@@ -55,9 +55,6 @@
 
 
 ;;;;;;;;;;;;;=============================================================================FIXME=========================================
-(defun request-episode-hosts (episode)
-  "Put in a request with the spawn manager to spider the episode listing pages on watchseries and return the host links."
-  episode)
 
 ;; Functions for host listing
 ;; --------------------------------------------------------------
