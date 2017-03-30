@@ -47,9 +47,10 @@
     :initform (error "Error: Season must have a number")
     :reader num
     :documentation "Number of this season")
-   (hosts
+   (episodes
+    :initarg :episodes
     :initform '()
-    :accessor hosts
+    :accessor episodes
     :documentation "Episodes of season")))
 
 (defmethod spawn ((se season)))
@@ -65,8 +66,10 @@
       :accessor url
       :documentation "The url of the show on watchseries")
      (seasons
+      :initarg :seasons
       :initform '()
       :accessor seasons
       :documentation "A list of seasons of this show")))
 
-(defmethod spawn ((sh show)))
+(defmethod spawn ((sh show))
+  )
