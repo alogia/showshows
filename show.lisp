@@ -1,6 +1,6 @@
 (in-package :showshows)
 
-(defclass episode (spawnable)
+(defclass episode (spawnable echos)
   ((show
     :initarg :show
     :initform (error "Error: episode must be part of a show")
@@ -37,8 +37,20 @@
   (with-slots (url hosts) ep
     (setf hosts (get-host-links (get-dom url)))))
 
+(defmethod echo-html ((ep episode))
+  (with-slots (show season num name date url) ep
+    (cl-who:with-html-output-to-string (*standard-output* nil :prologue nil :indent t)
+      (:div :class "episode" 
+	    (:div :class "header"
+		  (:meta :name "show" :content show)
+		  (:meta :name "season" :content season)
+		  (span "number" num)
+		  (span "name" name)
+		  (span "date" date))))))
 
-(defclass season (spawnable)
+(defmethod echo ((ep episode))) ;;-------------------Fixme------------------
+
+(defclass season (spawnable echos)
   ((show
     :initarg :show
     :initform (error "Error: episode must be part of a show")
@@ -59,7 +71,15 @@
   (with-slots (show url) se
     (setf se (process-season show (get-dom url)))))
 
-(defclass show (spawnable)
+(defmethod echo-html ((se season))
+  (with-slots (show num episodes) se
+      (cl-who:with-html-output-to-string (*standard-output* nil :prologue nil :indent t)
+	(:div :class "season"
+	      (:meta :name "show" :content show)
+	      (loop for ep in episodes do
+		   (cl-who:str (echo-html ep))))))) 
+
+(defclass show (spawnable echos)
     ((name
       :initarg :name
       :initform (error "Error: Show must have a name")
@@ -77,3 +97,11 @@
 
 (defmethod spawn ((sh show))
   (setf sh (parse-show (name sh) (url sh) (get-dom (url sh)))))
+
+(defmethod echo-html ((sh show))
+  (with-slots (name url seasons) sh
+      (cl-who:with-html-output-to-string (*standard-output* nil :prologue nil :indent t)
+	(:div :class "show"
+	      (:meta :name "url" :content url)
+	      (loop for se in seasons do
+		   (cl-who:str (echo-html se))))))) 

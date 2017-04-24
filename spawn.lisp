@@ -8,15 +8,15 @@
 ;;; and passes the spawnable object as argument. 
 
 
-(defvar *spider-lock* (bt:make-lock)) ;;A file lock to access the returned values of objects
-(defvar *spider-objects* '()) ; List of known objects added by (keep-spawnable)
-(defvar *spawn-list* '()) ; *spawn-list* is the running list of objects waiting to spawn a thread
-(defvar *spawn-lock* (bt:make-lock)) ; Lock to access global spawn manager variables
-(defvar *spawn-threads* '()) ; Threads created by the spawn manager 
-(defvar *spawn-manager* nil) ; The controlling running thread
-(defvar *spawn-threads-run* 0) ; Total number of threads run while the *spawn-manager* thread is alive
-(defvar *spawn-log* (pathname "spawn.log")) ; path to the spawn log file
-(defvar *spawn-log-lock* (bt:make-lock)) ; lock for the spawn log file
+(defvar *spider-lock*       (bt:make-lock)) ;;A file lock to access the returned values of objects
+(defvar *spider-objects*   '()) ; List of known objects added by (keep-spawnable)
+(defvar *spawn-list*       '()) ; *spawn-list* is the running list of objects waiting to spawn a thread
+(defvar *spawn-lock*        (bt:make-lock)) ; Lock to access global spawn manager variables
+(defvar *spawn-threads*    '()) ; Threads created by the spawn manager 
+(defvar *spawn-manager*      nil) ; The controlling running thread
+(defvar *spawn-threads-run*  0) ; Total number of threads run while the *spawn-manager* thread is alive
+(defvar *spawn-log*         (pathname "spawn.log")) ; path to the spawn log file
+(defvar *spawn-log-lock*    (bt:make-lock)) ; lock for the spawn log file
 
 ;; Generic superclass for all objects that can be passed to the spawn manager.
 ;; Subclass and pass to (spawn-request)
@@ -107,5 +107,5 @@
 
 (defun spawn-select (predicate)
   "Filter function with test predicate around the list of spider objects"
-  (mapcar #'spawn-request (remove-if-not predicate *spider-objects*)))
+  (mapcar #'spawn-request (remove-if (complement predicate) *spider-objects*)))
 

@@ -28,7 +28,7 @@
 				([episode] integer :not-null) ; link to [id] of [episode]
 				([uri]  string :not-null)
 				([last] integer) ; last time uri checked for validity
-				([success] boolean) ; last time link checked
+ 				([success] boolean) ; last time link checked
 				([size] integer)))) ; content-length from head
 
 (defun add-show (shows)

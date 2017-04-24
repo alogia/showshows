@@ -8,12 +8,12 @@
 
 (defun init-show (name url)
   (parse-show name url (get-dom url)))
-  
+
 (defun parse-show (name url node)
   (make-instance 'show
 		 :name name
 		 :url url
-		 :seasons (parse-seasons name node))))
+		 :seasons (parse-seasons name node)))
 
 (defun parse-seasons (name node)
   "Call this method on the main seasons page for a show"
@@ -37,7 +37,7 @@
 	  (collect-nodes node (elements ("itemprop" . "episode"))))))
 
 (defun process-episode (show season node)
-  "Internal function to parse show nodes"
+  "Internal function to parse episode nodes"
   (let ((num (html5-parser:element-attribute (find-first-node node #'html-recurse-p (elements ("itemprop" . "episodenumber"))) "content"))
 	(a (find-first-node node #'html-recurse-p (types "a"))))
     (let
@@ -52,9 +52,6 @@
 		     :date (if date (html5-parser:node-value date) "Unknown")
 		     :url url)))) ; Init host links to nil, and fill only upon request.
 
-
-
-;;;;;;;;;;;;;=============================================================================FIXME=========================================
 
 ;; Functions for host listing
 ;; --------------------------------------------------------------

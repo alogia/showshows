@@ -6,6 +6,7 @@
   :serial t
   :components ((:file "package")
 	       (:file "main")
+	       (:file "echos")
 	       (:file "show")
 	       (:file "host")
 	       (:file "watchseries")
