@@ -1,5 +1,14 @@
 (in-package :showshows)
 
+(require 'cl-who)
+
+;;; Class definitions for show, season, and episodes information. 
+
+
+;; Class containing information about show episodes, subclasses spawnable and echos
+;; Contains list of hosts for episode
+;; Must impliment spawn, echo, echo-html
+
 (defclass episode (spawnable echos)
   ((show
     :initarg :show
@@ -37,6 +46,9 @@
   (with-slots (url hosts) ep
     (setf hosts (get-host-links (get-dom url)))))
 
+(defmethod echo ((ep episode))
+  ) ;;-------------------Fixme------------------
+
 (defmethod echo-html ((ep episode))
   (with-slots (show season num name date url) ep
     (cl-who:with-html-output-to-string (*standard-output* nil :prologue nil :indent t)
@@ -48,7 +60,10 @@
 		  (span "name" name)
 		  (span "date" date))))))
 
-(defmethod echo ((ep episode))) ;;-------------------Fixme------------------
+
+;; Class containing information about show seasons, subclasses spawnable and echos
+;; Contains list of episodes
+;; Must impliment spawn, echo, echo-html
 
 (defclass season (spawnable echos)
   ((show
@@ -71,6 +86,9 @@
   (with-slots (show url) se
     (setf se (process-season show (get-dom url)))))
 
+(defmethod echo ((se season))
+  ) ;;-------------------Fixme------------------
+
 (defmethod echo-html ((se season))
   (with-slots (show num episodes) se
       (cl-who:with-html-output-to-string (*standard-output* nil :prologue nil :indent t)
@@ -78,6 +96,11 @@
 	      (:meta :name "show" :content show)
 	      (loop for ep in episodes do
 		   (cl-who:str (echo-html ep))))))) 
+
+
+;; Class containing information about shows, subclasses spawnable and echos
+;; Contains list of seasons
+;; Must impliment spawn, echo, echo-html
 
 (defclass show (spawnable echos)
     ((name
@@ -97,6 +120,9 @@
 
 (defmethod spawn ((sh show))
   (setf sh (parse-show (name sh) (url sh) (get-dom (url sh)))))
+
+(defmethod echo ((sh show))
+  ) ;;-------------------Fixme------------------
 
 (defmethod echo-html ((sh show))
   (with-slots (name url seasons) sh

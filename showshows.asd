@@ -13,7 +13,8 @@
 	       (:file "vidto.me")
 	       (:file "database")
 	       (:file "web")
-	       (:file "spawn"))
+	       (:file "spawn")
+	       (:file "test"))
   :depends-on (:drakma
 	       :cl-base64
 	       :cl-ppcre

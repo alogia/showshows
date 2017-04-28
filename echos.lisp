@@ -11,3 +11,4 @@
 
 (defgeneric echo-html (echos)
   (:documentation "Abstract function for printable objects to html"))
+

@@ -50,3 +50,6 @@
 			 :rel "stylesheet"
 			 :href "web/css/default.css"))
 	   (:body ,@body))))
+
+(defmacro span (class string)
+  `(cl-who:htm (:span :class ,class (cl-who:str ,string))))
