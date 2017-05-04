@@ -125,3 +125,4 @@
 
 (defmacro span (class string)
   `(cl-who:htm (:span :class ,class (cl-who:str ,string))))
+

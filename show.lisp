@@ -122,6 +122,7 @@
   (setf sh (parse-show (name sh) (url sh) (get-dom (url sh)))))
 
 (defmethod echo ((sh show))
+  
   ) ;;-------------------Fixme------------------
 
 (defmethod echo-html ((sh show))

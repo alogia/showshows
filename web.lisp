@@ -9,7 +9,7 @@
 
 (defun get-show-info (show)
   "Pulls show info from the api on omdbapi.com and returns the data as a decoded json list"
-  (json:decode-json-from-string (map 'string 'code-char (drakma:http-request (make-get-request "http://www.omdbapi.com" `(("t" . ,show) ("r" . "json"))) :method :get))))
+  (json:decode-json-from-string (drakma:http-request (make-get-request "http://www.omdbapi.com" `(("t" . ,show) ("r" . "json"))) :method :get)))
 
 (defun get-show-poster (show)
   "Pulls the poster from the show info retrieved in (get-show-info)"
@@ -25,7 +25,34 @@
 (defun make-landing ()
   "Creates the landing page for hunchentoot."
   (hunchentoot:define-easy-handler (front-page :uri "/") ()
-    (page-skel "Showshows" (:img :src (get-show-poster "game of thrones")))))
+    (page-skel "Showshows" (cl-who:str (generate-show-tables *show*)))))
+
+(defun generate-show-tables (show)
+  (with-slots (name url seasons) show
+      (cl-who:with-html-output-to-string (*standard-output* nil :prologue nil :indent t)
+	(:div :class "show"
+	      (:meta :name "url" :content url)
+	      (loop for se in seasons do
+		   (cl-who:str (generate-season-table se)))))))
+
+(defun generate-season-table (season)
+  (with-slots (show num episodes) season
+      (cl-who:with-html-output-to-string (*standard-output* nil :prologue nil :indent t)
+	(:table :class "season"
+	      (:meta :name "show" :content show)
+	      (:tr (:th "#")
+		   (:th "Name")
+		   (:th "Date"))
+	      (loop for ep in episodes do
+		   (cl-who:str (generate-episode-td ep))))))) 
+
+(defun generate-episode-td (episode)
+  (with-slots (show season num name date url) episode
+    (cl-who:with-html-output-to-string (*standard-output* nil :prologue nil :indent t)
+      (:tr :class "episode"
+	   (td "number" num)
+	   (td "name" name)
+	   (td "date" date)))))
 
 (defun make-table (table)
   "Pass this macro a list of lists to generate a table"
@@ -51,5 +78,3 @@
 			 :href "web/css/default.css"))
 	   (:body ,@body))))
 
-(defmacro span (class string)
-  `(cl-who:htm (:span :class ,class (cl-who:str ,string))))
