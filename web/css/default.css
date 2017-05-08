@@ -17,3 +17,13 @@ table, th, td {
     border: 1px solid white;
     padding: 5px;
 }
+
+ul.episode li {
+    display:inline;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+ul.episode .date {
+    float: right;
+}

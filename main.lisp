@@ -123,8 +123,3 @@
   "Returns the length of data found at uri."
     (parse-integer (cdr (assoc :content-length (get-header uri)))))
 
-(defmacro span (class string)
-  `(cl-who:htm (:span :class ,class (cl-who:str ,string))))
-
-(defmacro td (class string)
-  `(cl-who:htm (:td :class ,class (cl-who:str ,string))))
