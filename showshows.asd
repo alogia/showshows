@@ -21,6 +21,8 @@
 	       :cl-html5-parser
 	       :clsql
 	       :md5
+	       :smackjack
+	       :parenscript
 	       :cl-json
 	       :cl-who
 	       :bordeaux-threads
