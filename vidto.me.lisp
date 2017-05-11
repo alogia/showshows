@@ -1,7 +1,7 @@
 (in-package :showshows)
 (require :cl-ppcre)
 
-(defclass host-vidtome (host) ())
+(clsql:def-view-class host-vidtome (host) ())
 
 (defmethod wait-post ((host host-vidtome))
   (with-slots (url) host

@@ -7,13 +7,13 @@
   :components ((:file "package")
 	       (:file "main")
 	       (:file "echos")
+	       (:file "spawn")
 	       (:file "show")
 	       (:file "host")
 	       (:file "watchseries")
 	       (:file "vidto.me")
 	       (:file "database")
 	       (:file "web")
-	       (:file "spawn")
 	       (:file "test"))
   :depends-on (:drakma
 	       :cl-base64

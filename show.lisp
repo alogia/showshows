@@ -9,38 +9,66 @@
 ;; Contains list of hosts for episode
 ;; Must impliment spawn, echo, echo-html
 
-(defclass episode (spawnable echos)
-  ((show
-    :initarg :show
+
+(clsql:def-view-class episode (spawnable echos)
+  ((id
+    :reader id
+    :initarg :id
+    :type integer 
+    :db-constraints (:not-null :auto-increment)
+    :db-kind :key)
+   (show-id
+    :initarg :show-id
     :initform (error "Error: episode must be part of a show")
-    :reader show
+    :reader show-id
+    :type integer
     :documentation "Parent show to which this episode belongs")
-   (season
-    :initarg :season
+   (season-id
+    :initarg :season-id
     :initform (error "Error: episode must have a season")
-    :reader season
+    :reader season-id
+    :type integer
     :documentation "Season to which this episode belongs")
    (num
     :initarg :num
     :initform (error "Error: episode must have a number")
     :reader num
+    :type integer
     :documentation "Number of this episode in the season")
    (name
     :initarg :name
     :reader name
+    :type string
     :documentation "Name of episode")
    (date
     :initarg :date
-    :reader date
+    :reader wall-time
+    :type string
     :documentation "Date of episode")
    (url
     :initarg :url
     :reader url
     :documentation "Url of episode")
+   (last-checked
+    :accessor last-checked
+    :initarg :last-checked
+    :initform nil
+    :type wall-time
+    :documentation "Last time the uri was checked as valid.")
+   (success
+    :accessor success
+    :initarg :success
+    :initform nil
+    :type bool
+    :documentation "Was the last check successful.")
    (hosts
-    :initform '()
     :accessor hosts
-    :documentation "Hosts of episode")))
+    :initarg :hosts
+    :db-kind :join
+    :db-info (:join-class host
+			  :home-key id
+			  :foreign-key episode-id
+			  :set t))))
 
 (defmethod spawn ((ep episode))
   (with-slots (url hosts) ep
@@ -65,22 +93,33 @@
 ;; Contains list of episodes
 ;; Must impliment spawn, echo, echo-html
 
-(defclass season (spawnable echos)
-  ((show
-    :initarg :show
-    :initform (error "Error: episode must be part of a show")
-    :reader show
-    :documentation "Parent show to which this Season belongs")
+(clsql:def-view-class season (spawnable echos)
+  ((id
+    :reader id
+    :initarg :id
+    :type integer 
+    :db-constraints (:not-null :auto-increment)
+    :db-kind :key)
+   (show-id
+    :initarg :show-id
+    :initform (error "Error: a season must be part of a show")
+    :reader show-id
+    :type integer
+    :documentation "Parent show to which this season belongs")
    (num
     :initarg :num
     :initform (error "Error: Season must have a number")
     :reader num
+    :type integer
     :documentation "Number of this season")
    (episodes
-    :initarg :episodes
-    :initform '()
     :accessor episodes
-    :documentation "Episodes of season")))
+    :documentation "Episodes of season"
+    :db-kind :join
+    :db-info (:join-class episode
+			  :home-key id
+			  :foreign-key season-id
+			  :set t))))
 
 (defmethod spawn ((se season))
   (with-slots (show url) se
@@ -102,21 +141,50 @@
 ;; Contains list of seasons
 ;; Must impliment spawn, echo, echo-html
 
-(defclass show (spawnable echos)
-    ((name
-      :initarg :name
-      :initform (error "Error: Show must have a name")
-      :reader name
-      :documentation "Show's name")
-     (url
-      :initarg :url
-      :accessor url
-      :documentation "The url of the show on watchseries")
-     (seasons
-      :initarg :seasons
-      :initform '()
-      :accessor seasons
-      :documentation "A list of seasons of this show")))
+(clsql:def-view-class show (spawnable echos)
+  ((id
+    :type integer
+    :reader id
+    :initarg :id
+    :db-constraints (:not-null :auto-increment)
+    :db-kind :key
+    :documentation "Database unique key.")
+   (name
+    :type string 
+    :initarg :name
+    :initform (error "Error: Show must have a name")
+    :reader name
+    :documentation "Show's name")
+   (url
+    :type string
+    :initarg :url
+    :accessor url
+    :documentation "The url of the show on watchseries")
+   (img
+    :accessor img
+    :initarg :img
+    :initform nil
+    :type string
+    :documentation "Image associated with the show.")
+   (last-checked
+    :accessor last-checked
+    :initarg :last-checked
+    :initform nil
+    :type wall-item
+    :documentation "Last time the link was scraped.")
+   (success
+    :accessor success
+    :initarg :success
+    :initform nil
+    :type bool
+    :documenation "Was the last check successful.")
+   (seasons
+    :accessor seasons
+    :db-kind :join
+    :db-info (:join-class season
+			  :home-key id
+			  :foreign-key show-id
+			  :set t))))
 
 (defmethod spawn ((sh show))
   (setf sh (parse-show (name sh) (url sh) (get-dom (url sh)))))
@@ -131,4 +199,4 @@
 	(:div :class "show"
 	      (:meta :name "url" :content url)
 	      (loop for se in seasons do
-		   (cl-who:str (echo-html se))))))) 
+		   (cl-who:str (echo-html se)))))))

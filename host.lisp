@@ -5,28 +5,50 @@
 ;;;     wait-post
 ;;;     parse-video
 
-;;Generic host class for all hosting websites 
-(defclass host (spawnable)
-  ((video
+;; Basic class definition for hosting website.
+(clsql:def-view-class host (spawnable echos)
+  ((id
+    :reader id
+    :initarg :id
+    :type integer 
+    :db-constraints (:not-null :auto-increment)
+    :db-kind :key)
+   (episode-id
+    :reader episode-id
+    :initarg :episode-id
+    :type integer
+    :documentation "id of the episode to which this refers.")
+   (url
+    :reader url
+    :initarg :url
+    :initform nil
+    :type string
+    :documentation "The url of the hosting page")
+   (video
+    :accessor video
     :initarg :video
-    :accessor video-url
+    :initform nil
+    :type string
     :documentation "The url of the video")
-   (dom
-    :initarg :dom
-    :accessor dom
-    :documentation "cl-html5-parser dom returned by parsing http response")
-   (checked
-    :initarg :checked
-    :accessor checked
-    :documentation "The last date this link was checked as existant.")
-   (exists
-    :initarg :exists
-    :accessor exists
-    :documentation "Is this link still valid?")
-   (dled
-    :initarg :dled
-    :accessor dled
-    :documentation "Is this video downloaded?")))
+   (last-checked
+    :accessor last-checked
+    :initarg :last-checked
+    :initform nil
+    :type wall-time
+    :documentation "Last time the uri was checked as valid.")
+   (success
+    :accessor success
+    :initarg :success
+    :initform nil
+    :type bool
+    :documentation "Was the last check successful.")
+   (size
+    :accessor size
+    :initarg :size
+    :initform nil
+    :type integer
+    :documentation "The size of the video.")))
+
 
 (defgeneric wait-post (host)
   (:documentation "Post data to wait ad page on first call"))
@@ -40,8 +62,10 @@
 	 (v (parse-video h res))
 	 (e (uri-exists? v)))
     (bt:with-lock-held (*spider-lock*)
-      (progn (setf (dom h) res)
-	     (setf (video-url h) v)
-	     (setf (checked h) (get-universal-time))
-	     (setf (exists h) e)
+      (progn (setf (video h) v)
+	     (setf (last-checked h) (get-universal-time))
+	     (setf (success h) e)
 	     200)))) ;; success: return 200 
+
+(defmethod echo ((h host)))
+(defmethod echo-html ((h host)))

@@ -110,7 +110,7 @@
       (cl-who:htm
 	(:div (format t "Season ~D" num))
 	(:div :class "season" (loop for ep in episodes do
-	     (generate-episode-div ep)))))))
+				   (generate-episode-div ep))))))
 
 (defmacro generate-episode-div (episode)
   `(with-slots (show season num name date url) ,episode
@@ -145,7 +145,7 @@
       (:tr :class "episode"
 	   (td "number" num)
 	   (td "name" name)
-	   (td "date" date))))))
+	   (td "date" date)))))
 
 (defmacro page-skel (title &body body)
   "Defines the basic html code which should subsume page individualizations."
