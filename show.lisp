@@ -104,13 +104,13 @@
     :db-kind :key)
    (show-id
     :initarg :show-id
-    :initform (error "Error: a season must be part of a show")
+    :initform 0
     :reader show-id
     :type integer
     :documentation "Parent show to which this season belongs")
    (num
     :initarg :num
-    :initform (error "Error: Season must have a number")
+    :initform 0
     :reader num
     :type integer
     :documentation "Number of this season")
@@ -154,7 +154,7 @@
    (name
     :type string 
     :initarg :name
-    :initform (error "Error: Show must have a name")
+    :initform nil
     :reader name
     :documentation "Show's name")
    (url
