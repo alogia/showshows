@@ -10,34 +10,32 @@
   (parse-show name url (get-dom url)))
 
 (defun parse-show (name url node)
-  (clsql:update-roconds-from-instance (make-instance 'show
-		 :name name
-		 :url url))
-  (parse-seasons name node))
+  (let ((show-id (car (clsql:update-records-from-instance (make-instance 'show :name name :url url)))))
+	(parse-seasons node show-id)))
 
-(defun parse-seasons (name node show-id)
+(defun parse-seasons (node show-id)
   "Call this method on the main seasons page for a show"
-    (mapcar #'(lambda (n) (clsql:update-records-from-instance (process-season name n)))
+    (mapcar #'(lambda (n) (clsql:update-records-from-instance (process-season n show-id)))
 	    (collect-nodes node (elements ("itemprop" . "season"))))))
 
-(defun process-season (show node)
+(defun process-season (node show-id)
   "Internal function to parse the season nodes"
   (let* ((listing (find-first-node node 'html-recurse-p (elements ("class" . "listings show-listings"))))
 	 (num (parse-integer (car (ppcre:all-matches-as-strings "[0-9]+$" (html5-parser:element-attribute listing "id")))))
 	 (a (find-first-node node 'html-recurse-p (types "a")))
 	 (url (html5-parser:element-attribute a "href")))
-    (make-instance 'season
+    (let ((season-id (make-instance 'season
 		   :url url
-		   :show show
-		   :num num)
-    (parse-episodes show num node)))
+		   :show-id show-id
+		   :num num)))
+    (parse-episodes node show-id season-id))))
 
-(defun parse-episodes (show season node)
+(defun parse-episodes (node show-id season-id)
   "Internal function to parse season nodes"
-  (mapcar (lambda (s) (clsql:update-records-from-instance (process-episode show season s)))
+  (mapcar (lambda (s) (clsql:update-records-from-instance (process-episode s show-id season-id)))
 	  (collect-nodes node (elements ("itemprop" . "episode")))))
 
-(defun process-episode (show season node)
+(defun process-episode (node show-id season-id)
   "Internal function to parse episode nodes"
   (let ((num (html5-parser:element-attribute (find-first-node node #'html-recurse-p (elements ("itemprop" . "episodenumber"))) "content"))
 	(a (find-first-node node #'html-recurse-p (types "a"))))
@@ -46,8 +44,8 @@
 	  (name (html5-parser:node-first-child (find-first-node a #'html-recurse-p (elements ("itemprop" . "name")))))
 	  (date (html5-parser:node-first-child (find-first-node a #'html-recurse-p (elements ("itemprop" . "datepublished"))))))
       (make-instance 'episode
-		     :show show
-		     :season season
+		     :show-id show-id
+		     :season-id season-id
 		     :num num
 		     :name (if name (html5-parser:node-value name) "Unknown")
 		     :date (if date (html5-parser:node-value date) "Unknown")
