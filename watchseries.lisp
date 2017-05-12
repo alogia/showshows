@@ -10,17 +10,18 @@
   (parse-show name url (get-dom url)))
 
 (defun parse-show (name url node)
-  (make-instance 'show
+  (clsql:update-roconds-from-instance (make-instance 'show
 		 :name name
-		 :url url
-		 :seasons (parse-seasons name node)))
+		 :url url))
+  (parse-seasons name node))
 
-(defun parse-seasons (name node)
+(defun parse-seasons (name node show-id)
   "Call this method on the main seasons page for a show"
-    (reverse (mapcar #'(lambda (n) (process-season name n))
+    (mapcar #'(lambda (n) (clsql:update-records-from-instance (process-season name n)))
 	    (collect-nodes node (elements ("itemprop" . "season"))))))
 
 (defun process-season (show node)
+  "Internal function to parse the season nodes"
   (let* ((listing (find-first-node node 'html-recurse-p (elements ("class" . "listings show-listings"))))
 	 (num (parse-integer (car (ppcre:all-matches-as-strings "[0-9]+$" (html5-parser:element-attribute listing "id")))))
 	 (a (find-first-node node 'html-recurse-p (types "a")))
@@ -28,13 +29,13 @@
     (make-instance 'season
 		   :url url
 		   :show show
-		   :num num
-		   :episodes (parse-episodes show num node))))
+		   :num num)
+    (parse-episodes show num node)))
 
 (defun parse-episodes (show season node)
   "Internal function to parse season nodes"
-  (reverse (mapcar (lambda (s) (process-episode show season s))
-	  (collect-nodes node (elements ("itemprop" . "episode"))))))
+  (mapcar (lambda (s) (clsql:update-records-from-instance (process-episode show season s)))
+	  (collect-nodes node (elements ("itemprop" . "episode")))))
 
 (defun process-episode (show season node)
   "Internal function to parse episode nodes"
@@ -71,3 +72,4 @@
 (defun get-links (node)
   (cdr (mapcar (lambda (n) (html5-parser:element-attribute n "href"))
 	  (collect-nodes node (elements ("target" . "_blank") ("class" . "buttonLink"))))))
+2

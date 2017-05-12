@@ -1,5 +1,5 @@
 (in-package :showshows)
-
+(require 'clsql)
 (require 'cl-who)
 
 ;;; Class definitions for show, season, and episodes information. 
@@ -42,24 +42,25 @@
     :documentation "Name of episode")
    (date
     :initarg :date
-    :reader wall-time
-    :type string
+    :reader date
+    :type string 
     :documentation "Date of episode")
    (url
     :initarg :url
     :reader url
+    :type string
     :documentation "Url of episode")
    (last-checked
     :accessor last-checked
     :initarg :last-checked
-    :initform nil
-    :type wall-time
+    :initform 0
+    :type integer
     :documentation "Last time the uri was checked as valid.")
    (success
     :accessor success
     :initarg :success
-    :initform nil
-    :type bool
+    :initform 0
+    :type integer
     :documentation "Was the last check successful.")
    (hosts
     :accessor hosts
@@ -169,14 +170,14 @@
    (last-checked
     :accessor last-checked
     :initarg :last-checked
-    :initform nil
-    :type wall-item
+    :initform 0
+    :type integer
     :documentation "Last time the link was scraped.")
    (success
     :accessor success
     :initarg :success
-    :initform nil
-    :type bool
+    :initform 0
+    :type integer
     :documenation "Was the last check successful.")
    (seasons
     :accessor seasons
