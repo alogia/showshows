@@ -14,6 +14,7 @@
   "Main program initializations"
   (setq drakma:*text-content-types* (cons '("application" . "json")
 					  drakma:*text-content-types*))
+  (init-database)
   (init-web 4242))
 
 (defun get-dom (url)

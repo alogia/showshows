@@ -46,11 +46,6 @@
     :reader date
     :type string 
     :documentation "Date of episode")
-   (url
-    :initarg :url
-    :reader url
-    :type string
-    :documentation "Url of episode")
    (last-checked
     :accessor last-checked
     :initarg :last-checked
@@ -157,11 +152,6 @@
     :initform nil
     :reader name
     :documentation "Show's name")
-   (url
-    :type string
-    :initarg :url
-    :accessor url
-    :documentation "The url of the show on watchseries")
    (img
     :accessor img
     :initarg :img

@@ -20,11 +20,11 @@
 
 ;; Generic superclass for all objects that can be passed to the spawn manager.
 ;; Subclass and pass to (spawn-request)
-(defclass spawnable ()
+(clsql:def-view-class spawnable ()
   ((url
     :initarg :url
-    :initform (error "Error: No url provided")
-    :reader url
+    :type string
+    :accessor url
     :documentation "The url of the page containing the video link")))
 
 (defgeneric spawn (spawnable)
@@ -80,7 +80,6 @@
   (spawn-log "Threads run: ~D" *spawn-threads-run*)
   (bt:destroy-thread *spawn-manager*)
   (setf *spawn-threads-run* 0))
-
 
 
 (defun spawn-thread (spawnable)

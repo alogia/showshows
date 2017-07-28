@@ -43,7 +43,7 @@
 		:href ,link
 		,text)))
 
-(defmacro make-ajax-link (text link element)
+(defun make-ajax-link (text link element)
   "Returns an a link named 'text' with a request to 'link' whose response will replace 'element'"
   `(cl-who:htm (:a
 		:href "#"
@@ -94,22 +94,25 @@
     (page-skel "Showshows" (:div :class "view"
 				 (:div :class "episode-list"
 				       (make-ajax-link
-					"True Detective"
-					(make-get-link 'show-info '("foo") t)
-					".view"))))))
+					 "True Detective"
+					 (make-get-link 'show-info '("foo") t)
+					 ".view"))))))
 
 (defun generate-show-accordion (show)
   (with-slots (name url seasons) show
     (html-out
-     (:div :class "show accordion"
+     (:div :class "show ui accordion"
 	      (loop for se in seasons do
 		   (generate-season-accordion se))))))
 
 (defmacro generate-season-accordion (season)
   `(with-slots (show num episodes) ,season
       (cl-who:htm
-	(:div (format t "Season ~D" num))
-	(:div :class "season" (loop for ep in episodes do
+       (:div :class "title"
+	     (:i :class "dropdown icon")
+	     (format t "Season ~D" num))
+	(:div :class "season"
+	      (loop for ep in episodes do
 				   (generate-episode-div ep))))))
 
 (defmacro generate-episode-div (episode)
@@ -149,7 +152,7 @@
 
 (defmacro page-skel (title &body body)
   "Defines the basic html code which should subsume page individualizations."
-  `(cl-who:with-html-output-to-string (*standard-output* nil :prologue t :indent t)
+  `(html-out-p
     (:html :xmlns "http://www.w3.org/1999/xhtml" :lang "en"
            (:head (:meta :http-equiv "Content-Type" :content "text/html;charset=utf-8")
                   (:title ,title)
